@@ -1,0 +1,33 @@
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <zebra.BarcodeDetector.OverlayView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/overlayView"/>
+
+
+    <TextView
+        android:id="@+id/tvOCRout"
+        android:layout_width="wrap_content"
+        android:layout_height="66dp"
+        android:layout_weight="1"
+        android:text="" />
+
+    <ToggleButton
+        android:id="@+id/toggleAnalyzerMode"
+        android:layout_below="@id/tvOCRout"
+        android:layout_width="99dp"
+        android:layout_height="40dp"
+        android:textOn="ZETA"
+        android:textOff="MLKit"
+        android:visibility="gone"/>
+</RelativeLayout>

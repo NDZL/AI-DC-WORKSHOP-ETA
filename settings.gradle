@@ -1,0 +1,3 @@
+rootProject.name = "AI-DC-WORKSHOP-ETA"
+include ":entitytracker"
+

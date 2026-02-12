@@ -1,0 +1,111 @@
+package zebra.BarcodeDetector
+
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.util.AttributeSet
+import android.util.Log
+import android.view.View
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedDeque
+
+class OverlayView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+
+    companion object {
+        private const val TAG = "OverlayView"
+
+        //GOOD RESOLUTIONS FOR BARCODES, 2FT AWAY:  1080x1920 (2Mpx) less accurate, 2048x1536 (3Mpx) ,  1920x2560 (5Mpx) slower
+        var CAMERA_RESOLUTION_WIDTH = 480
+        var CAMERA_RESOLUTION_HEIGHT = 640
+        var CHOSEN_SCENE=0
+        var ZOOM_RATIO=1.0
+        var BARCODETOHIGHLIGHT = ""
+
+    }
+
+    val clq = ConcurrentLinkedDeque<BCEvent>() // java.util.concurrent.ConcurrentLinkedQueue<BCEvent>()
+    val performanceSet: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    val highlightSet: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    var readRate:Int=0
+
+    val paintYellow = Paint().apply {
+        color = Color.YELLOW
+        strokeWidth = 5f
+        style = Paint.Style.STROKE
+    }
+
+    val paintGray = Paint().apply {
+        color = Color.GRAY
+        strokeWidth = 5f
+        style = Paint.Style.STROKE
+    }
+
+    val paintGreen = Paint().apply {
+        color = Color.rgb(0, 190, 0)
+        strokeWidth = 20f
+        style = Paint.Style.STROKE
+    }
+
+    val paintRed = Paint().apply {
+        color = Color.rgb(190, 0, 0) // Color.RED
+        strokeWidth = 20f
+        style = Paint.Style.FILL_AND_STROKE
+    }
+
+    val ink = Paint().apply {
+        color = Color.YELLOW
+        textSize = 50f
+    }
+
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+
+        val timestamp = System.currentTimeMillis() as Long
+
+        if(clq.isNotEmpty())
+            clq.map {
+
+                if (timestamp - (it.timestamp) < 500) {
+
+                        val XX = it.xavg
+                        val YY = it.yavg
+                        canvas.drawCircle(XX, YY, 20f, it.paint)
+//                        canvas.drawText(
+//                            "${anlzr} ANALYZER: READ RATE ${readRate*1000/ CameraXActivity.VIEW_RESET_PERIOD_MS}/sec",
+//                            20f,
+//                            60f,
+//                            ink
+//                        )
+
+                    canvas.drawText(
+                        "${it.bcValue}-[${it.trackingID}]",
+                        XX,
+                        YY,
+                        ink
+                    )
+
+                }
+                else {
+
+                    clq.remove(it)
+
+                }
+            }
+            Log.d("drawCircle", "clq size = "+clq.size.toString())
+    }
+
+
+
+    fun rotateAndScaleCoordinates(
+        cameraCoords: Pair<Float, Float>,
+        cameraWidth: Float, cameraHeight: Float,
+        screenWidth: Float, screenHeight: Float
+    ): Pair<Float, Float> {
+        val scaleX = screenWidth / cameraWidth
+        val scaleY = screenHeight / cameraHeight
+        return Pair((cameraWidth - cameraCoords.second) * scaleX, cameraCoords.first * scaleY)
+    }
+
+}
