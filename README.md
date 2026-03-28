@@ -21,3 +21,4 @@
 
 - https://techdocs.zebra.com/ai-datacapture/3-1/camerax/
   
+![](https://cxnt48.com/author?ghAIDCWORKSHOP) 
